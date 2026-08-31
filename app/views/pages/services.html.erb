@@ -1,0 +1,24 @@
+<h1>Services</h1>
+
+<p>List of services offered (you may need more than one).</p>
+
+<div class="row">
+  <div class="col-12 col-md-8">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Service</th>
+          <th scope="col">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @jobs.each do |job| %>
+          <tr>
+            <td><%= job[:name] %></td>
+            <td>$<%= job[:price] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
