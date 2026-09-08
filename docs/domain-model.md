@@ -1,19 +1,27 @@
+Updated tables for postgres implementation:
+
 Table customers {
   id integer [pk, increment]
   name varchar [not null]
   phone varchar [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
 }
 
 Table bikes {
   id integer [pk, increment]
-  customer_id integer [not null, ref: > customers.id]
+  customer_id integer [not null]
   model varchar [not null]
   serial_number varchar [not null, unique]
+  created_at datetime [not null]
+  updated_at datetime [not null]
 }
 
 Table mechanics {
   id integer [pk, increment]
   name varchar [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
 }
 
 Table repairs {
@@ -22,40 +30,35 @@ Table repairs {
   mechanic_id integer
   status varchar [not null, default: 'dropped_off']
   decision varchar
-  promised_date date
+  promised_on date
   dropped_off_at datetime [not null]
   collected_at datetime
-}
-
-Table photos {
-  id integer [pk, increment]
-  repair_id integer [not null, ref: > repairs.id]
-  image_path varchar [not null]
-  taken_at datetime [not null]
-}
-
-Table diagnosis_notes {
-  id integer [pk, increment]
-  repair_id integer [not null, unique, ref: - repairs.id]
-  content text [not null]
+  created_at datetime [not null]
   updated_at datetime [not null]
 }
 
 Table service_items {
   id integer [pk, increment]
   name varchar [not null, unique]
-  current_price decimal [not null]
+  current_price decimal(8,2) [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
 }
 
 Table repair_line_items {
   id integer [pk, increment]
-  repair_id integer [not null, ref: > repairs.id]
-  service_item_id integer [not null, ref: > service_items.id]
-  price_charged decimal [not null]
+  repair_id integer [not null]
+  service_item_id integer [not null]
+  price_charged decimal(8,2) [not null]
+  created_at datetime [not null]
+  updated_at datetime [not null]
 }
 
+Ref: bikes.customer_id > customers.id
 Ref: repairs.bike_id > bikes.id
 Ref: repairs.mechanic_id > mechanics.id
+Ref: repair_line_items.repair_id > repairs.id
+Ref: repair_line_items.service_item_id > service_items.id
 
 ![Database Diagram](images/lab3dbdiagram.png)
 
