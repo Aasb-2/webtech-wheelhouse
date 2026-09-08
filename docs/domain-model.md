@@ -40,7 +40,7 @@ Table repairs {
 Table service_items {
   id integer [pk, increment]
   name varchar [not null, unique]
-  current_price decimal(8,2) [not null]
+  current_price decimal(10,2) [not null]
   created_at datetime [not null]
   updated_at datetime [not null]
 }
@@ -49,7 +49,7 @@ Table repair_line_items {
   id integer [pk, increment]
   repair_id integer [not null]
   service_item_id integer [not null]
-  price_charged decimal(8,2) [not null]
+  price_charged decimal(10,2) [not null]
   created_at datetime [not null]
   updated_at datetime [not null]
 }
