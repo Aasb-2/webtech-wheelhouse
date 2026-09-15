@@ -1,0 +1,6 @@
+<% content_for :title, @service_item.name %>
+
+<h1><%= @service_item.name %></h1>
+<p>Current price: $<%= "%.2f" % @service_item.current_price %></p>
+
+<%= link_to "Back to Services", services_path %>

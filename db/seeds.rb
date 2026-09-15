@@ -50,7 +50,8 @@ customers = [
   ["Hugo Navarro", "+56 9 5555 0108"],
   ["Isabel Contreras", "+56 9 5555 0109"],
   ["Javier Espinoza", "+56 9 5555 0110"],
-  ["Karen Valdés", "+56 9 5555 0111"]
+  ["Karen Valdés", "+56 9 5555 0111"],
+  ["Javiera Acuña", "+56 9 1234 5678"]
 ]
 
 customer_records = {}
@@ -77,7 +78,8 @@ bike_data = [
   ["Hugo Navarro", "Trek Marlin", "MAR-1009"],
   ["Isabel Contreras", "Cannondale Quick", "QUI-1010"],
   ["Javier Espinoza", "Giant Talon", "TAL-1011"],
-  ["Karen Valdés", "Specialized Allez", "ALL-1012"]
+  ["Karen Valdés", "Specialized Allez", "ALL-1012"],
+  ["Javiera Acuña", "Terraneitor", "ENF-1234"]
 ]
 
 bike_data.each do |customer_name, model, serial_number|

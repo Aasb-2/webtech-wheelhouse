@@ -1,0 +1,24 @@
+<h1>Services</h1>
+
+<p>Here's everything we do, and what it costs. A typical repair usually needs two or three of these.</p>
+
+<% if @service_items.any? %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @service_items.each do |item| %>
+        <tr>
+          <td><%= link_to item.name, service_item_path(item) %></td>
+          <td>$<%= "%.2f" % item.current_price %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No services listed yet.</p>
+<% end %>

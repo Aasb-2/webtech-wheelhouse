@@ -1,0 +1,20 @@
+<h1>Mechanics</h1>
+
+<% if @mechanics.any? %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @mechanics.each do |mechanic| %>
+        <tr>
+          <td><%= link_to mechanic.name, mechanic_path(mechanic) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No mechanics yet.</p>
+<% end %>

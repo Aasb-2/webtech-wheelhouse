@@ -1,0 +1,41 @@
+<% content_for :title, "Repair ##{@repair.id}" %>
+
+<h1>Repair #<%= @repair.id %></h1>
+
+<p>Bike: <%= link_to @repair.bike.model, bike_path(@repair.bike) %></p>
+<p>Customer: <%= link_to @repair.bike.customer.name, customer_path(@repair.bike.customer) %></p>
+<p>Mechanic: <%= @repair.mechanic&.name || "Unassigned" %></p>
+<p>Status: <%= @repair.status.titleize %></p>
+<p>
+  Promised: <%= @repair.promised_on&.strftime("%b %-d, %Y") || "—" %>
+  <% if @repair.promised_on.present? && @repair.promised_on < Date.current && @repair.status != "collected" %>
+    <span class="badge bg-danger">Overdue</span>
+  <% end %>
+</p>
+<p>Dropped off: <%= @repair.dropped_off_at.strftime("%b %-d, %Y at %l:%M %p") %></p>
+<p>Collected: <%= @repair.collected_at&.strftime("%b %-d, %Y at %l:%M %p") || "Not yet collected" %></p>
+
+<h2>Services Charged</h2>
+<% if @repair.repair_line_items.any? %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th>Price Charged</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @repair.repair_line_items.each do |line_item| %>
+        <tr>
+          <td><%= link_to line_item.service_item.name, service_item_path(line_item.service_item) %></td>
+          <td>$<%= "%.2f" % line_item.price_charged %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <p><strong>Total: $<%= "%.2f" % @repair.repair_line_items.sum(:price_charged) %></strong></p>
+<% else %>
+  <p>No services charged yet.</p>
+<% end %>
+
+<%= link_to "Back to Repairs", repairs_path %>
