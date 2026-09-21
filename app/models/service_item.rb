@@ -1,3 +1,15 @@
 class ServiceItem < ApplicationRecord
   has_many :repair_line_items
+  has_many :repairs, through: :repair_line_items
+
+  before_validation :normalize_name
+
+  validates :name, presence: true, uniqueness: true
+  validates :current_price, presence: true, numericality: { greater_than: 0 }
+
+  private
+
+  def normalize_name
+    self.name = name.strip if name.present?
+  end
 end

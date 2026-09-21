@@ -147,7 +147,7 @@ repair_data = [
     bike: "SPD-1006",
     mechanic: mechanics[2],
     status: "collected",
-    decision: nil,
+    decision: "assumed_approved",
     promised_on: today,
     dropped_off_at: today.beginning_of_day + 8.hours,
     collected_at: today.beginning_of_day + 16.hours
