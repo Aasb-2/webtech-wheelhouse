@@ -2,8 +2,8 @@ class Repair < ApplicationRecord
   belongs_to :bike
   belongs_to :mechanic, optional: true
 
-  has_many :repair_line_items
-  has_many :services, through: :repair_line_items, source: :service_item
+has_many :repair_line_items, dependent: :destroy
+has_many :services, through: :repair_line_items, source: :service_item
 
   enum :status, {
     dropped_off: "dropped_off",

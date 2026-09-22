@@ -1,6 +1,6 @@
 class Bike < ApplicationRecord
   belongs_to :customer
-  has_many :repairs
+  has_many :repairs, dependent: :destroy
 
   before_validation :normalize_serial_number
 
