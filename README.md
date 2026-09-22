@@ -30,6 +30,8 @@ Clone the repository, then from its root, run the following in order:
 bundle install
 yarn install
 bin/rails db:create
+bin/rails db:migrate
+bin/rails db:seed
 ```
 
 ## Running the application
