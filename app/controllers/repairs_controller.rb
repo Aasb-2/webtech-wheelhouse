@@ -1,6 +1,6 @@
 class RepairsController < ApplicationController
   def index
-    @repairs = Repair.includes(:bike, :mechanic).order(dropped_off_at: :desc)
+    @repairs = Repair.includes(:bike, :mechanic).newest_first
   end
 
   def show

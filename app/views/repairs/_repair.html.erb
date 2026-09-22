@@ -1,4 +1,4 @@
-<% overdue = repair.promised_on.present? && repair.promised_on < Date.current && repair.status != "collected" %>
+<% overdue = repair.overdue? %>
 <tr class="<%= "table-danger" if overdue %>">
   <td><%= link_to "Repair ##{repair.id}", repair_path(repair) %></td>
   <td><%= link_to repair.bike.model, bike_path(repair.bike) %></td>

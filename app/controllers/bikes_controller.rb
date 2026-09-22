@@ -1,6 +1,6 @@
 class BikesController < ApplicationController
   def index
-    @bikes = Bike.includes(:customer).order(:model)
+    @bikes = Bike.includes(:customer).by_model
   end
 
   def show

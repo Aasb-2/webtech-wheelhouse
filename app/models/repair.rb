@@ -2,8 +2,8 @@ class Repair < ApplicationRecord
   belongs_to :bike
   belongs_to :mechanic, optional: true
 
-has_many :repair_line_items, dependent: :destroy
-has_many :services, through: :repair_line_items, source: :service_item
+  has_many :repair_line_items, dependent: :destroy
+  has_many :services, through: :repair_line_items, source: :service_item
 
   enum :status, {
     dropped_off: "dropped_off",
@@ -23,6 +23,18 @@ has_many :services, through: :repair_line_items, source: :service_item
 
   validate :collected_and_promised_not_before_dropped_off
   validate :decision_recorded_once_work_has_started
+
+  scope :open, -> { where.not(status: :collected) }
+  scope :overdue, -> { open.where(promised_on: ...Date.current) }
+  scope :newest_first, -> { order(dropped_off_at: :desc) }
+
+  def overdue?
+    !collected? && promised_on.present? && promised_on < Date.current
+  end
+
+  def total
+    repair_line_items.sum(:price_charged)
+  end
 
   private
 

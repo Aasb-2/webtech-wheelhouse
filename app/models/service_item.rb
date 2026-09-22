@@ -4,6 +4,8 @@ class ServiceItem < ApplicationRecord
 
   before_validation :normalize_name
 
+  scope :by_name, -> { order(:name) }
+
   validates :name, presence: true, uniqueness: true
   validates :current_price, presence: true, numericality: { greater_than: 0 }
 

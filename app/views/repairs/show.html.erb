@@ -8,7 +8,7 @@
 <p>Status: <%= @repair.status.titleize %></p>
 <p>
   Promised: <%= @repair.promised_on&.strftime("%b %-d, %Y") || "—" %>
-  <% if @repair.promised_on.present? && @repair.promised_on < Date.current && @repair.status != "collected" %>
+  <% if @repair.overdue? %>
     <span class="badge bg-danger">Overdue</span>
   <% end %>
 </p>
@@ -33,7 +33,7 @@
       <% end %>
     </tbody>
   </table>
-  <p><strong>Total: $<%= "%.2f" % @repair.repair_line_items.sum(:price_charged) %></strong></p>
+  <p><strong>Total: $<%= "%.2f" % @repair.total %></strong></p>
 <% else %>
   <p>No services charged yet.</p>
 <% end %>
