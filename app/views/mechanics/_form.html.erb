@@ -1,0 +1,14 @@
+<%= form_with model: mechanic do |form| %>
+  <%= render "shared/error_summary", record: mechanic %>
+
+  <div class="mb-3">
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, class: class_names("form-control", "is-invalid": mechanic.errors[:name].any?) %>
+    <% mechanic.errors.full_messages_for(:name).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <%= form.submit class: "btn btn-primary" %>
+  <%= link_to "Cancel", mechanic.persisted? ? mechanic : mechanics_path, class: "btn btn-outline-secondary" %>
+<% end %>

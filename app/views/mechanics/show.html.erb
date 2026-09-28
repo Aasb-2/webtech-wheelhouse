@@ -2,6 +2,11 @@
 
 <h1><%= @mechanic.name %></h1>
 
+<%= link_to "Edit", edit_mechanic_path(@mechanic), class: "btn btn-outline-primary" %>
+<%= button_to "Delete", mechanic_path(@mechanic), method: :delete,
+      class: "btn btn-danger",
+      form: { class: "d-inline", data: { turbo_confirm: "Delete mechanic #{@mechanic.name}?" } } %>
+
 <h2>Assigned Repairs</h2>
 <% if @mechanic.repairs.any? %>
   <table class="table table-striped">
