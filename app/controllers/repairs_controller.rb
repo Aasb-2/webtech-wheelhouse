@@ -4,6 +4,25 @@ class RepairsController < ApplicationController
   end
 
   def show
-    @repair = Repair.includes(:bike, :mechanic, repair_line_items: :service_item).find(params[:id])
+    @repair = Repair.includes(
+      :bike,
+      :mechanic,
+      repair_line_items: :service_item
+    ).find(params[:id])
+  end
+
+  def new
+  end
+
+  def edit
+  end
+
+  def create
+  end
+
+  def update
+  end
+
+  def destroy
   end
 end
