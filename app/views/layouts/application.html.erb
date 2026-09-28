@@ -23,8 +23,8 @@
               <%= link_to "Home", root_path, class: "nav-link #{'active' if current_page?(root_path)}" %>
             </li>
             <li class="nav-item">
-              <%= link_to "Services", services_path, class: "nav-link #{'active' if current_page?(services_path)}" %>
-            </li>
+  <%= link_to "Services", service_items_path, class: "nav-link #{'active' if current_page?(service_items_path)}" %>
+</li>
             <li class="nav-item">
               <%= link_to "Customers", customers_path, class: "nav-link #{'active' if current_page?(customers_path)}" %>
             </li>
@@ -48,8 +48,11 @@
       </div>
     </nav>
 
-    <main class="container">
-      <%= yield %>
-    </main>
-  </body>
-</html>
+<main class="container">
+  <% flash.each do |type, message| %>
+    <div class="alert alert-<%= type == "alert" ? "danger" : "success" %>" role="alert">
+      <%= message %>
+    </div>
+  <% end %>
+  <%= yield %>
+</main>

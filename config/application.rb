@@ -9,6 +9,7 @@ Bundler.require(*Rails.groups)
 module Lab3
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
+    config.action_view.field_error_proc = proc { |html_tag, _instance| html_tag }
     config.load_defaults 8.1
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
