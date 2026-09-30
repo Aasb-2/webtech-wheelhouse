@@ -1,0 +1,23 @@
+<%= form_with model: service_item do |form| %>
+  <%= render "shared/error_summary", record: service_item %>
+
+  <div class="mb-3">
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, class: class_names("form-control", "is-invalid": service_item.errors[:name].any?) %>
+    <% service_item.errors.full_messages_for(:name).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :current_price, "Current price", class: "form-label" %>
+    <%= form.number_field :current_price, step: 0.01, min: 0.01,
+          class: class_names("form-control", "is-invalid": service_item.errors[:current_price].any?) %>
+    <% service_item.errors.full_messages_for(:current_price).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <%= form.submit class: "btn btn-primary" %>
+  <%= link_to "Cancel", service_item.persisted? ? service_item : service_items_path, class: "btn btn-outline-secondary" %>
+<% end %>

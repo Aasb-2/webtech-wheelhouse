@@ -5,6 +5,10 @@ class Repair < ApplicationRecord
   has_many :repair_line_items, dependent: :destroy
   has_many :services, through: :repair_line_items, source: :service_item
 
+  accepts_nested_attributes_for :repair_line_items,
+  allow_destroy: true,
+  reject_if: proc { |attributes| attributes["service_item_id"].blank? }
+
   enum :status, {
     dropped_off: "dropped_off",
     in_diagnosis: "in_diagnosis",
@@ -33,10 +37,16 @@ class Repair < ApplicationRecord
   end
 
   def total
-    repair_line_items.sum(:price_charged)
+    repair_line_items.sum(&:price_charged)
   end
 
+  before_validation :nilify_blank_decision
+
   private
+
+  def nilify_blank_decision
+    self.decision = nil if decision.blank?
+  end
 
   def collected_and_promised_not_before_dropped_off
     return if dropped_off_at.blank?

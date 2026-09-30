@@ -4,6 +4,13 @@
 <p>Serial number: <%= @bike.serial_number %></p>
 <p>Owner: <%= link_to @bike.customer.name, customer_path(@bike.customer) %></p>
 
+<%= link_to "Edit", edit_bike_path(@bike), class: "btn btn-outline-primary" %>
+<%= button_to "Delete", bike_path(@bike), method: :delete,
+      class: "btn btn-danger",
+      form: { class: "d-inline", data: { turbo_confirm: "Delete bike #{@bike.serial_number}?" } } %>
+
+<%= link_to "New repair for this bike", new_repair_path(bike_id: @bike.id), class: "btn btn-outline-primary mb-3" %>
+
 <h2>Repairs</h2>
 <% if @bike.repairs.any? %>
   <table class="table table-striped">

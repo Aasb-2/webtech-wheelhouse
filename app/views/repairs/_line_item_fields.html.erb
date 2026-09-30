@@ -1,0 +1,23 @@
+<div class="row align-items-end mb-2 border-bottom pb-2">
+  <div class="col-12 col-md-5">
+    <%= form.label :service_item_id, "Service", class: "form-label" %>
+    <%= form.collection_select :service_item_id, ServiceItem.by_name, :id, :name,
+          { include_blank: "Select a service" }, class: "form-select" %>
+  </div>
+  <div class="col-8 col-md-4">
+    <%= form.label :price_charged, "Price charged", class: "form-label" %>
+    <%= form.number_field :price_charged, step: 0.01, min: 0.01,
+          class: class_names("form-control", "is-invalid": form.object.errors.any?) %>
+    <% form.object.errors.full_messages.each do |message| %>
+      <div class="invalid-feedback d-block"><%= message %></div>
+    <% end %>
+  </div>
+  <div class="col-4 col-md-3">
+    <% if form.object.persisted? %>
+      <div class="form-check">
+        <%= form.check_box :_destroy, class: "form-check-input" %>
+        <%= form.label :_destroy, "Remove", class: "form-check-label" %>
+      </div>
+    <% end %>
+  </div>
+</div>

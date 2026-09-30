@@ -1,0 +1,32 @@
+<%= form_with model: bike do |form| %>
+  <%= render "shared/error_summary", record: bike %>
+
+  <div class="mb-3">
+    <%= form.label :customer_id, "Customer", class: "form-label" %>
+    <%= form.collection_select :customer_id, Customer.by_name, :id, :name,
+          { prompt: "Select a customer" },
+          class: class_names("form-select", "is-invalid": bike.errors[:customer].any?) %>
+    <% bike.errors.full_messages_for(:customer).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :model, class: "form-label" %>
+    <%= form.text_field :model, class: class_names("form-control", "is-invalid": bike.errors[:model].any?) %>
+    <% bike.errors.full_messages_for(:model).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :serial_number, class: "form-label" %>
+    <%= form.text_field :serial_number, class: class_names("form-control", "is-invalid": bike.errors[:serial_number].any?) %>
+    <% bike.errors.full_messages_for(:serial_number).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <%= form.submit class: "btn btn-primary" %>
+  <%= link_to "Cancel", bike.persisted? ? bike : bikes_path, class: "btn btn-outline-secondary" %>
+<% end %>

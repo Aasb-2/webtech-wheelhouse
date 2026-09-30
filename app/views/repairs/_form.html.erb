@@ -1,0 +1,78 @@
+<%= form_with model: repair do |form| %>
+  <%= render "shared/error_summary", record: repair %>
+
+  <div class="mb-3">
+    <%= form.label :bike_id, "Bike", class: "form-label" %>
+    <%= form.collection_select :bike_id,
+          Bike.includes(:customer).by_model, :id,
+          ->(bike) { "#{bike.model} (#{bike.serial_number}) — #{bike.customer.name}" },
+          { prompt: "Select a bike" },
+          class: class_names("form-select", "is-invalid": repair.errors[:bike].any?) %>
+    <% repair.errors.full_messages_for(:bike).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :mechanic_id, "Mechanic", class: "form-label" %>
+    <%= form.collection_select :mechanic_id, Mechanic.by_name, :id, :name,
+          { include_blank: "Unassigned" }, class: "form-select" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :status, class: "form-label" %>
+    <%= form.select :status, Repair.statuses.keys.map { |key| [key.titleize, key] }, {},
+          class: class_names("form-select", "is-invalid": repair.errors[:status].any?) %>
+    <% repair.errors.full_messages_for(:status).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :decision, class: "form-label" %>
+    <%= form.select :decision, Repair::DECISIONS.map { |value| [value.titleize, value] },
+          { include_blank: "Not decided yet" },
+          class: class_names("form-select", "is-invalid": repair.errors[:decision].any?) %>
+    <% repair.errors.full_messages_for(:decision).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :dropped_off_at, "Dropped off at", class: "form-label" %>
+    <%= form.datetime_field :dropped_off_at,
+          class: class_names("form-control", "is-invalid": repair.errors[:dropped_off_at].any?) %>
+    <% repair.errors.full_messages_for(:dropped_off_at).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :promised_on, "Promised on", class: "form-label" %>
+    <%= form.date_field :promised_on,
+          class: class_names("form-control", "is-invalid": repair.errors[:promised_on].any?) %>
+    <% repair.errors.full_messages_for(:promised_on).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :collected_at, "Collected at", class: "form-label" %>
+    <%= form.datetime_field :collected_at,
+          class: class_names("form-control", "is-invalid": repair.errors[:collected_at].any?) %>
+    <% repair.errors.full_messages_for(:collected_at).each do |message| %>
+      <div class="invalid-feedback"><%= message %></div>
+    <% end %>
+  </div>
+
+  <hr>
+  <h2 class="h5">Services charged</h2>
+  <div id="repair-line-items">
+    <%= form.fields_for :repair_line_items do |line_form| %>
+      <%= render "line_item_fields", form: line_form %>
+    <% end %>
+  </div>
+
+  <%= form.submit class: "btn btn-primary mt-3" %>
+  <%= link_to "Cancel", repair.persisted? ? repair : repairs_path, class: "btn btn-outline-secondary mt-3" %>
+<% end %>
