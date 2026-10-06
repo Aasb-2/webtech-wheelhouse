@@ -7,7 +7,9 @@ Rails.application.routes.draw do
 
   resources :customers
   resources :bikes
-  resources :repairs
+  resources :repairs do
+    resources :photos, only: :destroy, controller: "repair_photos"
+  end
   resources :mechanics
   resources :service_items, path: "services"
 end

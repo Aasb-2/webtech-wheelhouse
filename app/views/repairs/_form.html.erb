@@ -65,6 +65,10 @@
     <% end %>
   </div>
 
+    <div class="mb-3">
+    <%= form.label :diagnosis, class: "form-label" %>
+    <%= form.rich_text_area :diagnosis %>
+  </div>
   <hr>
   <h2 class="h5">Services charged</h2>
   <div id="repair-line-items">
@@ -73,6 +77,36 @@
     <% end %>
   </div>
 
+  <hr>
+  <h2 class="h5">Add photos</h2>
+
+  <div class="mb-3">
+    <%= form.label :photos, "Add photos", class: "form-label" %>
+    <%= form.file_field :photos, multiple: true, accept: "image/jpeg,image/png",
+          class: class_names("form-control", "is-invalid": repair.errors[:photos].any?) %>
+    <% repair.errors.full_messages_for(:photos).each do |message| %>
+      <div class="invalid-feedback d-block"><%= message %></div>
+    <% end %>
+  </div>
+
   <%= form.submit class: "btn btn-primary mt-3" %>
   <%= link_to "Cancel", repair.persisted? ? repair : repairs_path, class: "btn btn-outline-secondary mt-3" %>
+<% end %>
+
+<% if repair.persisted? && repair.photos.attached? %>
+  <hr>
+  <h2 class="h5">Current photos</h2>
+  <div class="row mb-3">
+    <% repair.photos.select(&:persisted?).each do |photo| %>
+      <div class="col-auto text-center mb-2">
+        <%= image_tag photo.variant(:thumb), class: "img-thumbnail",
+              alt: "Photo of #{repair.bike.model} (#{repair.bike.serial_number}), repair ##{repair.id}" %>
+        <div class="mt-1">
+          <%= button_to "Remove", repair_photo_path(repair, photo), method: :delete,
+                class: "btn btn-sm btn-outline-danger",
+                form: { data: { turbo_confirm: "Remove this photo?" } } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
 <% end %>

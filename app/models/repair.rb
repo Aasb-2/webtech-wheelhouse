@@ -13,7 +13,7 @@ class Repair < ApplicationRecord
       attachable.variant :large, resize_to_limit: [800, 800]
     end
 
-  validate :photos_are_valid_images
+  validate :pending_photos_are_valid_images
 
   PHOTO_MAX_SIZE = 5.megabytes
   ALLOWED_PHOTO_TYPES = %w[image/jpeg image/png]
@@ -55,18 +55,22 @@ class Repair < ApplicationRecord
 
   before_validation :nilify_blank_decision
 
+  attr_accessor :pending_photo_uploads
+
+  validate :pending_photos_are_valid_images
+
   private
 
-  def photos_are_valid_images
-  photos.each do |photo|
-    next unless photo.new_record?
+def pending_photos_are_valid_images
+  Array(pending_photo_uploads).each do |file|
+    sniffed_type = Marcel::MimeType.for(file.tempfile)
 
-    unless ALLOWED_PHOTO_TYPES.include?(photo.content_type)
-      errors.add(:photos, "#{photo.filename} must be a JPEG or PNG image")
+    unless ALLOWED_PHOTO_TYPES.include?(sniffed_type)
+      errors.add(:photos, "#{file.original_filename} must be a JPEG or PNG image")
     end
 
-    if photo.byte_size > PHOTO_MAX_SIZE
-      errors.add(:photos, "#{photo.filename} is larger than #{PHOTO_MAX_SIZE / 1.megabyte}MB")
+    if file.tempfile.size > PHOTO_MAX_SIZE
+      errors.add(:photos, "#{file.original_filename} is larger than #{PHOTO_MAX_SIZE / 1.megabyte}MB")
     end
   end
 end
