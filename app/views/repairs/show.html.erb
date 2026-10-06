@@ -43,4 +43,28 @@
   <p>No services charged yet.</p>
 <% end %>
 
+<h2>Diagnosis</h2>
+<% if @repair.diagnosis.present? %>
+  <div class="diagnosis-content"><%= @repair.diagnosis %></div>
+<% else %>
+  <p>No diagnosis yet.</p>
+<% end %>
+
+<h2>Intake Photos</h2>
+<% if @repair.photos.attached? %>
+  <div class="row mb-3">
+    <% @repair.photos.each do |photo| %>
+      <div class="col-auto text-center mb-3">
+        <%= link_to url_for(photo), target: "_blank", rel: "noopener" do %>
+          <%= image_tag photo.variant(:large), class: "img-thumbnail",
+                style: "max-height: 300px;",
+                alt: "Photo of #{@repair.bike.model} (#{@repair.bike.serial_number}), repair ##{@repair.id}" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p>No photos yet.</p>
+<% end %>
+
 <%= link_to "Back to Repairs", repairs_path %>
