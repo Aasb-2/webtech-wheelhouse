@@ -2,7 +2,13 @@ class RepairsController < ApplicationController
   before_action :set_repair, only: %i[show edit update destroy]
 
   def index
-    @repairs = Repair.includes(bike: :customer, mechanic: [], repair_line_items: :service_item).newest_first
+    @repairs = Repair.includes(
+      bike: :customer,
+      mechanic: [],
+      repair_line_items: :service_item,
+      photos_attachments: { blob: { variant_records: :blob } },
+      rich_text_diagnosis: []
+    ).newest_first
   end
 
   def show
@@ -58,7 +64,13 @@ end
   private
 
   def set_repair
-    @repair = Repair.includes(bike: :customer, mechanic: [], repair_line_items: :service_item).find(params[:id])
+    @repair = Repair.includes(
+      bike: :customer,
+      mechanic: [],
+      repair_line_items: :service_item,
+      photos_attachments: { blob: { variant_records: :blob } },
+      rich_text_diagnosis: []
+    ).find(params[:id])
   end
 
   def repair_params
