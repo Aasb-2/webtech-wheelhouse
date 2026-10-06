@@ -5,6 +5,19 @@ class Repair < ApplicationRecord
   has_many :repair_line_items, dependent: :destroy
   has_many :services, through: :repair_line_items, source: :service_item
 
+  has_many_attached :photos
+  has_rich_text :diagnosis
+
+    has_many_attached :photos do |attachable|
+      attachable.variant :thumb, resize_to_fill: [150, 150]
+      attachable.variant :large, resize_to_limit: [800, 800]
+    end
+
+  validate :photos_are_valid_images
+
+  PHOTO_MAX_SIZE = 5.megabytes
+  ALLOWED_PHOTO_TYPES = %w[image/jpeg image/png]
+
   accepts_nested_attributes_for :repair_line_items,
   allow_destroy: true,
   reject_if: proc { |attributes| attributes["service_item_id"].blank? }
@@ -43,6 +56,20 @@ class Repair < ApplicationRecord
   before_validation :nilify_blank_decision
 
   private
+
+  def photos_are_valid_images
+  photos.each do |photo|
+    next unless photo.new_record?
+
+    unless ALLOWED_PHOTO_TYPES.include?(photo.content_type)
+      errors.add(:photos, "#{photo.filename} must be a JPEG or PNG image")
+    end
+
+    if photo.byte_size > PHOTO_MAX_SIZE
+      errors.add(:photos, "#{photo.filename} is larger than #{PHOTO_MAX_SIZE / 1.megabyte}MB")
+    end
+  end
+end
 
   def nilify_blank_decision
     self.decision = nil if decision.blank?
