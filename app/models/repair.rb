@@ -1,49 +1,50 @@
 class Repair < ApplicationRecord
+  STATUSES = %w[dropped_off in_diagnosis awaiting_decision in_progress ready_for_pickup collected].freeze
+  DECISIONS = %w[approved declined assumed_approved].freeze
+  PHOTO_MAX_SIZE = 5.megabytes
+  ALLOWED_PHOTO_TYPES = %w[image/jpeg image/png].freeze
+
   belongs_to :bike
   belongs_to :mechanic, optional: true
 
   has_many :repair_line_items, dependent: :destroy
   has_many :services, through: :repair_line_items, source: :service_item
 
-  has_many_attached :photos
+  has_many_attached :photos do |attachable|
+    attachable.variant :thumb, resize_to_fill: [150, 150]
+    attachable.variant :large, resize_to_limit: [800, 800]
+  end
   has_rich_text :diagnosis
 
-    has_many_attached :photos do |attachable|
-      attachable.variant :thumb, resize_to_fill: [150, 150]
-      attachable.variant :large, resize_to_limit: [800, 800]
-    end
-
-  validate :pending_photos_are_valid_images
-
-  PHOTO_MAX_SIZE = 5.megabytes
-  ALLOWED_PHOTO_TYPES = %w[image/jpeg image/png]
-
   accepts_nested_attributes_for :repair_line_items,
-  allow_destroy: true,
-  reject_if: proc { |attributes| attributes["service_item_id"].blank? }
+    allow_destroy: true,
+    reject_if: proc { |attributes| attributes["service_item_id"].blank? }
 
-  enum :status, {
-    dropped_off: "dropped_off",
-    in_diagnosis: "in_diagnosis",
-    awaiting_decision: "awaiting_decision",
-    in_progress: "in_progress",
-    ready_for_pickup: "ready_for_pickup",
-    collected: "collected"
-  }, default: "dropped_off"
-
-  DECISIONS = %w[approved declined assumed_approved].freeze
+  attr_accessor :pending_photo_uploads
 
   validates :bike, presence: true
   validates :dropped_off_at, presence: true
-  validates :status, presence: true
+  validates :status, presence: true, inclusion: { in: STATUSES }
   validates :decision, inclusion: { in: DECISIONS }, allow_nil: true
 
+  validate :valid_status_transition
   validate :collected_and_promised_not_before_dropped_off
   validate :decision_recorded_once_work_has_started
+  validate :pending_photos_are_valid_images
+
+  before_validation :nilify_blank_decision
+  before_validation :set_collected_at, if: -> { status == "collected" && collected_at.blank? }
 
   scope :open, -> { where.not(status: :collected) }
   scope :overdue, -> { open.where(promised_on: ...Date.current) }
   scope :newest_first, -> { order(dropped_off_at: :desc) }
+
+  STATUSES.each do |status_name|
+    scope status_name, -> { where(status: status_name) }
+    define_method("#{status_name}?") do
+      status == status_name
+    end
+  end
 
   def overdue?
     !collected? && promised_on.present? && promised_on < Date.current
@@ -53,27 +54,56 @@ class Repair < ApplicationRecord
     repair_line_items.sum(&:price_charged)
   end
 
-  before_validation :nilify_blank_decision
-
-  attr_accessor :pending_photo_uploads
-
-  validate :pending_photos_are_valid_images
+  def move_to!(new_status)
+    @transition_from = self.status
+    self.status = new_status
+    self.collected_at = Time.current if new_status.to_s == "collected"
+    save!
+  ensure
+    @transition_from = nil
+  end
 
   private
 
-def pending_photos_are_valid_images
-  Array(pending_photo_uploads).each do |file|
-    sniffed_type = Marcel::MimeType.for(file.tempfile)
+  def valid_status_transition
+    return if @transition_from.nil?
 
-    unless ALLOWED_PHOTO_TYPES.include?(sniffed_type)
-      errors.add(:photos, "#{file.original_filename} must be a JPEG or PNG image")
-    end
+    old_status = @transition_from.to_s
+    new_status = status.to_s
 
-    if file.tempfile.size > PHOTO_MAX_SIZE
-      errors.add(:photos, "#{file.original_filename} is larger than #{PHOTO_MAX_SIZE / 1.megabyte}MB")
+    return if old_status == new_status
+
+    allowed = case old_status
+              when "dropped_off"
+                %w[in_diagnosis awaiting_decision in_progress ready_for_pickup]
+              when "in_diagnosis"
+                %w[awaiting_decision in_progress ready_for_pickup]
+              when "awaiting_decision"
+                if decision == "approved" || decision == "assumed_approved"
+                  %w[in_progress]
+                elsif decision == "declined"
+                  %w[ready_for_pickup]
+                else
+                  []
+                end
+              when "in_progress"
+                %w[ready_for_pickup]
+              when "ready_for_pickup"
+                %w[collected]
+              when "collected"
+                []
+              else
+                []
+              end
+
+    unless allowed.include?(new_status)
+      errors.add(:status, "cannot transition from #{old_status} to #{new_status}")
     end
   end
-end
+
+  def set_collected_at
+    self.collected_at = Time.current
+  end
 
   def nilify_blank_decision
     self.decision = nil if decision.blank?
@@ -92,16 +122,22 @@ end
   end
 
   def decision_recorded_once_work_has_started
-    if %w[in_progress ready_for_pickup collected].include?(status) && decision.blank?
-      errors.add(:decision, "must be recorded before work starts")
-    end
-
-    if status == "collected" && collected_at.blank?
-      errors.add(:collected_at, "must be recorded once a repair is collected")
-    end
-
     if status != "collected" && collected_at.present?
       errors.add(:collected_at, "can't be set unless the repair has been collected")
+    end
+  end
+
+  def pending_photos_are_valid_images
+    Array(pending_photo_uploads).each do |file|
+      sniffed_type = Marcel::MimeType.for(file.tempfile)
+
+      unless ALLOWED_PHOTO_TYPES.include?(sniffed_type)
+        errors.add(:photos, "#{file.original_filename} must be a JPEG or PNG image")
+      end
+
+      if file.tempfile.size > PHOTO_MAX_SIZE
+        errors.add(:photos, "#{file.original_filename} is larger than #{PHOTO_MAX_SIZE / 1.megabyte}MB")
+      end
     end
   end
 end

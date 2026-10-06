@@ -325,3 +325,55 @@ line_items.each do |repair_key, items|
     line_item.save!
   end
 end
+
+# Intake photos
+photo_files = %w[bike_1.jpg bike_2.jpg bike_3.jpg bike_4.jpg bike_5.jpg].map do |filename|
+  { filename: filename, path: Rails.root.join("db/seeds/photos", filename) }
+end
+
+photo_assignments = {
+  diagnosis: [photo_files[0]],
+  approval: [photo_files[1], photo_files[2]],
+  approved: [photo_files[0], photo_files[3]],
+  ready: [photo_files[2]],
+  collected: [photo_files[1]],
+  overdue: [photo_files[0], photo_files[1], photo_files[2], photo_files[4]], # 4+ photos
+  declined: [photo_files[3]],
+  history_one: [photo_files[4]],
+  history_two: [photo_files[0], photo_files[2]],
+  historical: [photo_files[1]]
+  # fresh, extra_one, extra_two, extra_three: intentionally no photos (covers "at least two have none")
+}
+
+photo_assignments.each do |repair_key, files|
+  repair = repairs.fetch(repair_key)
+  next if repair.photos.attached?
+
+  files.each do |file|
+    repair.photos.attach(
+      io: File.open(file[:path]),
+      filename: file[:filename],
+      content_type: Marcel::MimeType.for(File.open(file[:path]))
+    )
+  end
+end
+
+# Diagnoses, with real formatting
+diagnosis_text = {
+  diagnosis: "<p>Initial inspection complete.</p><p><strong>Findings:</strong></p><ul><li>Worn brake pads</li><li>Chain stretch beyond spec</li><li>Derailleur hanger slightly bent</li></ul>",
+  approval: "<p><strong>Quote prepared</strong> for customer review.</p><ul><li>Full service recommended</li><li>Estimated 2 hours of labor</li></ul>",
+  approved: "<p>Customer <strong>approved</strong> the quoted work.</p><ul><li>Brake pads replaced</li><li>Gears adjusted and tested</li></ul>",
+  ready: "<p>Repair complete. <strong>Ready for pickup.</strong></p><ul><li>New chain installed</li><li>Cables replaced</li></ul>",
+  collected: "<p>Tyre replaced successfully. <strong>No further issues found.</strong></p>",
+  overdue: "<p><strong>Extensive repair in progress.</strong></p><ul><li>Full service underway</li><li>Wheel truing completed</li><li>Awaiting replacement part for final adjustment</li></ul>",
+  declined: "<p>Customer <strong>declined</strong> the suspension service after reviewing cost.</p><ul><li>Fork inspected</li><li>Minor oil seep noted, not urgent</li></ul>",
+  history_one: "<p>Routine <strong>brake bleed</strong> performed, no complications.</p>",
+  history_two: "<p>Gear and cable service completed.</p><ul><li>Rear derailleur indexed</li><li>Cables lubricated</li></ul>",
+  historical: "<p><strong>Full service</strong> completed ahead of long-term storage.</p><ul><li>Drivetrain degreased</li><li>Brakes inspected and adjusted</li></ul>"
+  # fresh, extra_one, extra_two, extra_three: intentionally blank — freshly dropped-off repairs have no diagnosis yet
+}
+
+diagnosis_text.each do |repair_key, html|
+  repair = repairs.fetch(repair_key)
+  repair.update!(diagnosis: html) if repair.diagnosis.blank?
+end
