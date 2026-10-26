@@ -11,3 +11,19 @@ If the answer is otherwise, a `counter_staff` (or generalized `employee`) table 
 **3. Is "regular customer" a status the shop tracks formally, or a judgment call a mechanic makes case by case when discounting a price?**
 Assumption made: there's no official `regular` identifier for customers. Prices are simply marked differently at the mechanic's discretion, without a recorded reason.
 If the answer is otherwise, `customers` gains an `is_regular` boolean, and `repair_line_items` could gain a `discount_reason` field to record why a price differs from list.
+
+
+## Account role default
+
+**The default role is `counter`.**
+
+Of the three roles, `counter` has the narrowest slice of the application: a counter-desk account
+only records intake and pickup — who dropped off a bike, who collected it — and reads what's
+already in the system. A `mechanic` account changes a repair's status, diagnosis and the services
+charged against it: judgment calls tied directly to the work on the bike. An `owner` account
+carries the full run of the shop, with no narrower duties below it.
+
+Giving `counter` to every freshly-created account — through the sign-up form, or a request
+written by hand that sends `user[role]=owner` — means a new account starts with the least it can
+do to the data. Promoting it to `mechanic` or `owner` is a deliberate act performed from the seed
+or the console, by someone who already has that authority.
