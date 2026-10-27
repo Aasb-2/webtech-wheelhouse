@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_234305) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_152900) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,9 +94,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_234305) do
     t.integer "mechanic_id"
     t.date "promised_on"
     t.string "status", default: "dropped_off", null: false
+    t.bigint "taken_in_by_id"
     t.datetime "updated_at", null: false
     t.index ["bike_id"], name: "index_repairs_on_bike_id"
     t.index ["mechanic_id"], name: "index_repairs_on_mechanic_id"
+    t.index ["taken_in_by_id"], name: "index_repairs_on_taken_in_by_id"
   end
 
   create_table "service_items", force: :cascade do |t|
@@ -134,6 +136,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_234305) do
   add_foreign_key "repair_line_items", "service_items"
   add_foreign_key "repairs", "bikes"
   add_foreign_key "repairs", "mechanics"
+  add_foreign_key "repairs", "users", column: "taken_in_by_id"
   add_foreign_key "sessions", "users"
   add_foreign_key "users", "mechanics"
 end

@@ -2,14 +2,15 @@ class RepairsController < ApplicationController
   before_action :set_repair, only: %i[show edit update destroy]
 
   def index
-    @repairs = Repair.includes(
-      bike: :customer,
-      mechanic: [],
-      repair_line_items: :service_item,
-      photos_attachments: { blob: { variant_records: :blob } },
-      rich_text_diagnosis: []
-    ).newest_first
-  end
+  @repairs = Repair.includes(
+    bike: :customer,
+    mechanic: [],
+    taken_in_by: [],
+    repair_line_items: :service_item,
+    photos_attachments: { blob: { variant_records: :blob } },
+    rich_text_diagnosis: []
+  ).newest_first
+end
 
   def show
   end
@@ -25,6 +26,7 @@ class RepairsController < ApplicationController
 
 def create
   @repair = Repair.new(repair_params.except(:photos))
+  @repair.taken_in_by = Current.user
   new_photos = repair_params[:photos]&.reject(&:blank?)
   @repair.pending_photo_uploads = new_photos
   @repair.photos.attach(new_photos) if new_photos.present?
@@ -64,14 +66,15 @@ end
   private
 
   def set_repair
-    @repair = Repair.includes(
-      bike: :customer,
-      mechanic: [],
-      repair_line_items: :service_item,
-      photos_attachments: { blob: { variant_records: :blob } },
-      rich_text_diagnosis: []
-    ).find(params[:id])
-  end
+  @repair = Repair.includes(
+    bike: :customer,
+    mechanic: [],
+    taken_in_by: [],
+    repair_line_items: :service_item,
+    photos_attachments: { blob: { variant_records: :blob } },
+    rich_text_diagnosis: []
+  ).find(params[:id])
+end
 
   def repair_params
     params.expect(

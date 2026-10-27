@@ -10,6 +10,7 @@
 <p>Bike: <%= link_to @repair.bike.model, bike_path(@repair.bike) %></p>
 <p>Customer: <%= link_to @repair.bike.customer.name, customer_path(@repair.bike.customer) %></p>
 <p>Mechanic: <%= @repair.mechanic&.name || "Unassigned" %></p>
+<p>Taken in by: <%= @repair.taken_in_by&.display_name || "—" %></p>
 <p>Status: <%= @repair.status.titleize %></p>
 <p>
   Promised: <%= @repair.promised_on&.strftime("%b %-d, %Y") || "—" %>
