@@ -38,6 +38,36 @@ mechanics = [
   Mechanic.find_or_create_by!(name: "Camila Fuentes")
 ]
 
+# Accounts
+def seed_account(email_address:, password:, role: nil, mechanic: nil)
+  user = User.find_or_initialize_by(email_address: email_address)
+
+  if user.new_record?
+    user.password = password
+    user.password_confirmation = password
+    user.role = role if role
+    user.mechanic = mechanic
+  end
+
+  user.save!
+  user
+end
+
+owner_account = seed_account(
+  email_address: "owner@wheelhouse.cl", password: "Ownerpass123", role: :owner, mechanic: mechanics[0]
+)
+counter_account = seed_account(
+  email_address: "counter@wheelhouse.cl", password: "Counterpass456", role: :counter, mechanic: mechanics[1]
+)
+mechanic_account = seed_account(
+  email_address: "mechanic@wheelhouse.cl", password: "Mechanicpass789", role: :mechanic, mechanic: mechanics[2]
+)
+# No role or mechanic passed — this one is created with the column default (`counter`)
+# and belongs to no staff member, demonstrating both defaults literally rather than restating them.
+unassigned_account = seed_account(
+  email_address: "newhire@wheelhouse.cl", password: "Newhirepass000"
+)
+
 # Customers
 customers = [
   ["Ana Pérez", "+56 9 5555 0101"],
@@ -96,146 +126,56 @@ today = Date.current
 repairs = {}
 
 repair_data = [
-  {
-    key: :diagnosis,
-    bike: "DOM-1001",
-    mechanic: mechanics[0],
-    status: "in_diagnosis",
-    decision: nil,
-    promised_on: today + 2,
-    dropped_off_at: today.beginning_of_day + 9.hours
-  },
-  {
-    key: :approval,
-    bike: "ALL-1002",
-    mechanic: mechanics[1],
-    status: "awaiting_decision",
-    decision: nil,
-    promised_on: today + 3,
-    dropped_off_at: today.beginning_of_day + 10.hours
-  },
-  {
-    key: :approved,
-    bike: "CON-1003",
-    mechanic: mechanics[2],
-    status: "in_progress",
-    decision: "approved",
-    promised_on: today + 1,
-    dropped_off_at: today.beginning_of_day - 1.day + 11.hours
-  },
-  {
-    key: :ready,
-    bike: "MAR-1004",
-    mechanic: mechanics[0],
-    status: "ready_for_pickup",
-    decision: "approved",
-    promised_on: today + 1,
-    dropped_off_at: today.beginning_of_day - 2.days + 9.hours
-  },
-  {
-    key: :collected,
-    bike: "TRA-1005",
-    mechanic: mechanics[1],
-    status: "collected",
-    decision: "approved",
-    promised_on: today - 2.days,
+  { key: :diagnosis, bike: "DOM-1001", mechanic: mechanics[0], taken_in_by: counter_account,
+    status: "in_diagnosis", decision: nil, promised_on: today + 2,
+    dropped_off_at: today.beginning_of_day + 9.hours },
+  { key: :approval, bike: "ALL-1002", mechanic: mechanics[1], taken_in_by: counter_account,
+    status: "awaiting_decision", decision: nil, promised_on: today + 3,
+    dropped_off_at: today.beginning_of_day + 10.hours },
+  { key: :approved, bike: "CON-1003", mechanic: mechanics[2], taken_in_by: mechanic_account,
+    status: "in_progress", decision: "approved", promised_on: today + 1,
+    dropped_off_at: today.beginning_of_day - 1.day + 11.hours },
+  { key: :ready, bike: "MAR-1004", mechanic: mechanics[0], taken_in_by: owner_account,
+    status: "ready_for_pickup", decision: "approved", promised_on: today + 1,
+    dropped_off_at: today.beginning_of_day - 2.days + 9.hours },
+  { key: :collected, bike: "TRA-1005", mechanic: mechanics[1], taken_in_by: counter_account,
+    status: "collected", decision: "approved", promised_on: today - 2.days,
     dropped_off_at: today.beginning_of_day - 4.days + 10.hours,
-    collected_at: today.beginning_of_day - 1.day + 15.hours
-  },
-  {
-    key: :same_day,
-    bike: "SPD-1006",
-    mechanic: mechanics[2],
-    status: "collected",
-    decision: "assumed_approved",
-    promised_on: today,
+    collected_at: today.beginning_of_day - 1.day + 15.hours },
+  { key: :same_day, bike: "SPD-1006", mechanic: mechanics[2], taken_in_by: mechanic_account,
+    status: "collected", decision: "assumed_approved", promised_on: today,
     dropped_off_at: today.beginning_of_day + 8.hours,
-    collected_at: today.beginning_of_day + 16.hours
-  },
-  {
-    key: :overdue,
-    bike: "DEF-1007",
-    mechanic: mechanics[0],
-    status: "in_progress",
-    decision: "approved",
-    promised_on: today - 3.days,
-    dropped_off_at: today.beginning_of_day - 5.days + 9.hours
-  },
-  {
-    key: :declined,
-    bike: "ROC-1008",
-    mechanic: mechanics[1],
-    status: "ready_for_pickup",
-    decision: "declined",
-    promised_on: today - 1.day,
-    dropped_off_at: today.beginning_of_day - 2.days + 13.hours
-  },
-  {
-    key: :history_one,
-    bike: "MAR-1009",
-    mechanic: mechanics[2],
-    status: "collected",
-    decision: "approved",
-    promised_on: today - 20.days,
+    collected_at: today.beginning_of_day + 16.hours },
+  { key: :overdue, bike: "DEF-1007", mechanic: mechanics[0], taken_in_by: owner_account,
+    status: "in_progress", decision: "approved", promised_on: today - 3.days,
+    dropped_off_at: today.beginning_of_day - 5.days + 9.hours },
+  { key: :declined, bike: "ROC-1008", mechanic: mechanics[1], taken_in_by: counter_account,
+    status: "ready_for_pickup", decision: "declined", promised_on: today - 1.day,
+    dropped_off_at: today.beginning_of_day - 2.days + 13.hours },
+  { key: :history_one, bike: "MAR-1009", mechanic: mechanics[2], taken_in_by: mechanic_account,
+    status: "collected", decision: "approved", promised_on: today - 20.days,
     dropped_off_at: today.beginning_of_day - 25.days + 10.hours,
-    collected_at: today.beginning_of_day - 19.days + 16.hours
-  },
-  {
-    key: :history_two,
-    bike: "MAR-1009",
-    mechanic: mechanics[0],
-    status: "ready_for_pickup",
-    decision: "approved",
-    promised_on: today - 2.days,
-    dropped_off_at: today.beginning_of_day - 5.days + 10.hours
-  },
-  {
-    key: :historical,
-    bike: "QUI-1010",
-    mechanic: mechanics[1],
-    status: "collected",
-    decision: "approved",
-    promised_on: Date.new(2025, 12, 20),
+    collected_at: today.beginning_of_day - 19.days + 16.hours },
+  { key: :history_two, bike: "MAR-1009", mechanic: mechanics[0], taken_in_by: owner_account,
+    status: "ready_for_pickup", decision: "approved", promised_on: today - 2.days,
+    dropped_off_at: today.beginning_of_day - 5.days + 10.hours },
+  { key: :historical, bike: "QUI-1010", mechanic: mechanics[1], taken_in_by: nil, # predates the account system
+    status: "collected", decision: "approved", promised_on: Date.new(2025, 12, 20),
     dropped_off_at: Date.new(2025, 12, 18).to_time.change(hour: 9),
-    collected_at: Date.new(2025, 12, 19).to_time.change(hour: 16)
-  },
-  {
-    key: :fresh,
-    bike: "TAL-1011",
-    mechanic: mechanics[2],
-    status: "dropped_off",
-    decision: nil,
-    promised_on: today + 4,
-    dropped_off_at: today.beginning_of_day + 12.hours
-  },
-  {
-    key: :extra_one,
-    bike: "ALL-1012",
-    mechanic: mechanics[0],
-    status: "in_diagnosis",
-    decision: nil,
-    promised_on: today + 5,
-    dropped_off_at: today.beginning_of_day + 9.hours
-  },
-  {
-    key: :extra_two,
-    bike: "DOM-1001",
-    mechanic: mechanics[1],
-    status: "ready_for_pickup",
-    decision: "approved",
-    promised_on: today + 1,
-    dropped_off_at: today.beginning_of_day - 1.day + 10.hours
-  },
-  {
-    key: :extra_three,
-    bike: "CON-1003",
-    mechanic: mechanics[2],
-    status: "collected",
-    decision: "declined",
-    promised_on: today - 6.days,
+    collected_at: Date.new(2025, 12, 19).to_time.change(hour: 16) },
+  { key: :fresh, bike: "TAL-1011", mechanic: mechanics[2], taken_in_by: nil, # intake not yet logged against an account
+    status: "dropped_off", decision: nil, promised_on: today + 4,
+    dropped_off_at: today.beginning_of_day + 12.hours },
+  { key: :extra_one, bike: "ALL-1012", mechanic: mechanics[0], taken_in_by: unassigned_account,
+    status: "in_diagnosis", decision: nil, promised_on: today + 5,
+    dropped_off_at: today.beginning_of_day + 9.hours },
+  { key: :extra_two, bike: "DOM-1001", mechanic: mechanics[1], taken_in_by: counter_account,
+    status: "ready_for_pickup", decision: "approved", promised_on: today + 1,
+    dropped_off_at: today.beginning_of_day - 1.day + 10.hours },
+  { key: :extra_three, bike: "CON-1003", mechanic: mechanics[2], taken_in_by: mechanic_account,
+    status: "collected", decision: "declined", promised_on: today - 6.days,
     dropped_off_at: today.beginning_of_day - 8.days + 11.hours,
-    collected_at: today.beginning_of_day - 6.days + 14.hours
-  }
+    collected_at: today.beginning_of_day - 6.days + 14.hours }
 ]
 
 repair_data.each do |data|
@@ -245,6 +185,7 @@ repair_data.each do |data|
   )
 
   repair.mechanic_id = data[:mechanic]&.id
+  repair.taken_in_by_id = data[:taken_in_by]&.id
   repair.status = data[:status]
   repair.decision = data[:decision]
   repair.promised_on = data[:promised_on]
