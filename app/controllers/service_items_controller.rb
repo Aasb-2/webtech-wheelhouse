@@ -1,9 +1,11 @@
 class ServiceItemsController < ApplicationController
+  allow_unauthenticated_access only: %i[index show]
   before_action :set_service_item, only: %i[show edit update destroy]
 
   def index
     @service_items = ServiceItem.by_name
   end
+  # ... rest of the controller unchanged
 
   def show
   end

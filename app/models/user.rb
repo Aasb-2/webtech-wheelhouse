@@ -11,4 +11,9 @@ class User < ApplicationRecord
     format: { with: URI::MailTo::EMAIL_REGEXP },
     uniqueness: { case_sensitive: false }
   validates :password, length: { minimum: 10 }, allow_nil: true
+
+    def display_name
+    mechanic&.name || email_address
+  end
 end
+
