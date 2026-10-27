@@ -47,6 +47,33 @@ This starts both the Rails server and the Bootstrap Sass watcher. Visit
 `bin/rails server` will also start the application, but will not compile or watch the
 stylesheets — use `bin/dev` during development.
 
+Most pages require signing in — see [Signing in (development)](#signing-in-development) below
+for seed accounts, or use the sign-up page.
+
+## Signing in (development)
+
+Most pages now require a session — the exceptions are the services price list, signing in,
+signing up, and the forgotten-password flow. The seed creates four accounts to sign in with.
+**These accounts and passwords exist only in development — never use them anywhere else.**
+
+| Email                   | Password          | Role                | Linked staff member |
+|--------------------------|--------------------|----------------------|-----------------------|
+| owner@wheelhouse.cl      | Ownerpass123       | owner                | Sofia Morales          |
+| counter@wheelhouse.cl    | Counterpass456     | counter              | Daniel Rojas            |
+| mechanic@wheelhouse.cl   | Mechanicpass789    | mechanic             | Camila Fuentes          |
+| newhire@wheelhouse.cl    | Newhirepass000     | counter (default)    | — (no staff member)    |
+
+New accounts can also be created from the sign-up page (linked from the sign-in page) — a
+sign-up always gets the default role and no linked staff member. Promoting an account or
+linking it to a staff member is done from `bin/rails console`, not from any page.
+
+## Email in development
+
+The application never sends real email and needs no mail provider, SMTP server, or credential.
+Every email it sends (password-reset instructions, the welcome email) goes through the
+`letter_opener` gem: a browser tab opens automatically the moment an email is sent, and a copy
+is also saved to `tmp/letter_opener/`, where past emails can be browsed at any time.
+
 ## API (Lab 10)
 
 The application also exposes a read-mostly JSON API under `/api/v1`. Full route
