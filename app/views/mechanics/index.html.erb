@@ -1,5 +1,7 @@
 <h1>Mechanics</h1>
-<%= link_to "New mechanic", new_mechanic_path, class: "btn btn-primary mb-3" %>
+<% if policy(Mechanic).new? %>
+  <%= link_to "New mechanic", new_mechanic_path, class: "btn btn-primary mb-3" %>
+<% end %>
 
 <% if @mechanics.any? %>
   <table class="table table-striped">

@@ -1,9 +1,13 @@
 <% content_for :title, @service_item.name %>
 
-<%= link_to "Edit", edit_service_item_path(@service_item), class: "btn btn-outline-primary" %>
-<%= button_to "Delete", service_item_path(@service_item), method: :delete,
-      class: "btn btn-danger",
-      form: { class: "d-inline", data: { turbo_confirm: "Delete service #{@service_item.name}?" } } %>
+<% if policy(@service_item).edit? %>
+  <%= link_to "Edit", edit_service_item_path(@service_item), class: "btn btn-outline-primary" %>
+<% end %>
+<% if policy(@service_item).destroy? %>
+  <%= button_to "Delete", service_item_path(@service_item), method: :delete,
+        class: "btn btn-danger",
+        form: { class: "d-inline", data: { turbo_confirm: "Delete service #{@service_item.name}?" } } %>
+<% end %>
 
 <h1><%= @service_item.name %></h1>
 <p>Current price: $<%= "%.2f" % @service_item.current_price %></p>

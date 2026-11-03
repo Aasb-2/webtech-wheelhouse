@@ -2,13 +2,31 @@
 
 <h1>Repair #<%= @repair.id %></h1>
 
-<%= link_to "Edit", edit_repair_path(@repair), class: "btn btn-outline-primary" %>
-<%= button_to "Delete", repair_path(@repair), method: :delete,
-      class: "btn btn-danger",
-      form: { class: "d-inline", data: { turbo_confirm: "Delete this repair for #{@repair.bike.serial_number}?" } } %>
+<% if policy(@repair).edit? %>
+  <%= link_to "Edit", edit_repair_path(@repair), class: "btn btn-outline-primary" %>
+<% end %>
+<% if policy(@repair).destroy? %>
+  <%= button_to "Delete", repair_path(@repair), method: :delete,
+        class: "btn btn-danger",
+        form: { class: "d-inline", data: { turbo_confirm: "Delete this repair for #{@repair.bike.serial_number}?" } } %>
+<% end %>
 
-<p>Bike: <%= link_to @repair.bike.model, bike_path(@repair.bike) %></p>
-<p>Customer: <%= link_to @repair.bike.customer.name, customer_path(@repair.bike.customer) %></p>
+<p>
+  Bike:
+  <% if policy(@repair.bike).show? %>
+    <%= link_to @repair.bike.model, bike_path(@repair.bike) %>
+  <% else %>
+    <%= @repair.bike.model %>
+  <% end %>
+</p>
+<p>
+  Customer:
+  <% if policy(@repair.bike.customer).show? %>
+    <%= link_to @repair.bike.customer.name, customer_path(@repair.bike.customer) %>
+  <% else %>
+    <%= @repair.bike.customer.name %>
+  <% end %>
+</p>
 <p>Mechanic: <%= @repair.mechanic&.name || "Unassigned" %></p>
 <p>Taken in by: <%= @repair.taken_in_by&.display_name || "—" %></p>
 <p>Status: <%= @repair.status.titleize %></p>

@@ -3,22 +3,26 @@ class ServiceItemsController < ApplicationController
   before_action :set_service_item, only: %i[show edit update destroy]
 
   def index
-    @service_items = ServiceItem.by_name
+    @service_items = policy_scope(ServiceItem).by_name
   end
-  # ... rest of the controller unchanged
 
   def show
+    authorize @service_item
   end
 
   def new
     @service_item = ServiceItem.new
+    authorize @service_item
   end
 
   def edit
+    authorize @service_item
   end
 
   def create
     @service_item = ServiceItem.new(service_item_params)
+    authorize @service_item
+
     if @service_item.save
       redirect_to @service_item, notice: "Service #{@service_item.name} was created."
     else
@@ -27,6 +31,8 @@ class ServiceItemsController < ApplicationController
   end
 
   def update
+    authorize @service_item
+
     if @service_item.update(service_item_params)
       redirect_to @service_item, notice: "Service #{@service_item.name} was updated."
     else
@@ -35,6 +41,8 @@ class ServiceItemsController < ApplicationController
   end
 
   def destroy
+    authorize @service_item
+
     if @service_item.destroy
       redirect_to service_items_path, notice: "Service #{@service_item.name} was deleted.", status: :see_other
     else

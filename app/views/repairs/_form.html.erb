@@ -1,23 +1,27 @@
 <%= form_with model: repair do |form| %>
   <%= render "shared/error_summary", record: repair %>
 
-  <div class="mb-3">
-    <%= form.label :bike_id, "Bike", class: "form-label" %>
-    <%= form.collection_select :bike_id,
-          Bike.includes(:customer).by_model, :id,
-          ->(bike) { "#{bike.model} (#{bike.serial_number}) — #{bike.customer.name}" },
-          { prompt: "Select a bike" },
-          class: class_names("form-select", "is-invalid": repair.errors[:bike].any?) %>
-    <% repair.errors.full_messages_for(:bike).each do |message| %>
-      <div class="invalid-feedback"><%= message %></div>
-    <% end %>
-  </div>
+  <% if policy(repair).may_edit?(:bike_id) %>
+    <div class="mb-3">
+      <%= form.label :bike_id, "Bike", class: "form-label" %>
+      <%= form.collection_select :bike_id,
+            Bike.includes(:customer).by_model, :id,
+            ->(bike) { "#{bike.model} (#{bike.serial_number}) — #{bike.customer.name}" },
+            { prompt: "Select a bike" },
+            class: class_names("form-select", "is-invalid": repair.errors[:bike].any?) %>
+      <% repair.errors.full_messages_for(:bike).each do |message| %>
+        <div class="invalid-feedback"><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
 
-  <div class="mb-3">
-    <%= form.label :mechanic_id, "Mechanic", class: "form-label" %>
-    <%= form.collection_select :mechanic_id, Mechanic.by_name, :id, :name,
-          { include_blank: "Unassigned" }, class: "form-select" %>
-  </div>
+  <% if policy(repair).may_edit?(:mechanic_id) %>
+    <div class="mb-3">
+      <%= form.label :mechanic_id, "Mechanic", class: "form-label" %>
+      <%= form.collection_select :mechanic_id, Mechanic.by_name, :id, :name,
+            { include_blank: "Unassigned" }, class: "form-select" %>
+    </div>
+  <% end %>
 
   <div class="mb-3">
     <%= form.label :status, class: "form-label" %>
@@ -28,66 +32,79 @@
     <% end %>
   </div>
 
-  <div class="mb-3">
-    <%= form.label :decision, class: "form-label" %>
-    <%= form.select :decision, Repair::DECISIONS.map { |value| [value.titleize, value] },
-          { include_blank: "Not decided yet" },
-          class: class_names("form-select", "is-invalid": repair.errors[:decision].any?) %>
-    <% repair.errors.full_messages_for(:decision).each do |message| %>
-      <div class="invalid-feedback"><%= message %></div>
-    <% end %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :dropped_off_at, "Dropped off at", class: "form-label" %>
-    <%= form.datetime_field :dropped_off_at,
-          class: class_names("form-control", "is-invalid": repair.errors[:dropped_off_at].any?) %>
-    <% repair.errors.full_messages_for(:dropped_off_at).each do |message| %>
-      <div class="invalid-feedback"><%= message %></div>
-    <% end %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :promised_on, "Promised on", class: "form-label" %>
-    <%= form.date_field :promised_on,
-          class: class_names("form-control", "is-invalid": repair.errors[:promised_on].any?) %>
-    <% repair.errors.full_messages_for(:promised_on).each do |message| %>
-      <div class="invalid-feedback"><%= message %></div>
-    <% end %>
-  </div>
-
-  <div class="mb-3">
-    <%= form.label :collected_at, "Collected at", class: "form-label" %>
-    <%= form.datetime_field :collected_at,
-          class: class_names("form-control", "is-invalid": repair.errors[:collected_at].any?) %>
-    <% repair.errors.full_messages_for(:collected_at).each do |message| %>
-      <div class="invalid-feedback"><%= message %></div>
-    <% end %>
-  </div>
-
+  <% if policy(repair).may_edit?(:decision) %>
     <div class="mb-3">
+      <%= form.label :decision, class: "form-label" %>
+      <%= form.select :decision, Repair::DECISIONS.map { |value| [value.titleize, value] },
+            { include_blank: "Not decided yet" },
+            class: class_names("form-select", "is-invalid": repair.errors[:decision].any?) %>
+      <% repair.errors.full_messages_for(:decision).each do |message| %>
+        <div class="invalid-feedback"><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if policy(repair).may_edit?(:dropped_off_at) %>
+    <div class="mb-3">
+      <%= form.label :dropped_off_at, "Dropped off at", class: "form-label" %>
+      <%= form.datetime_field :dropped_off_at,
+            class: class_names("form-control", "is-invalid": repair.errors[:dropped_off_at].any?) %>
+      <% repair.errors.full_messages_for(:dropped_off_at).each do |message| %>
+        <div class="invalid-feedback"><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if policy(repair).may_edit?(:promised_on) %>
+    <div class="mb-3">
+      <%= form.label :promised_on, "Promised on", class: "form-label" %>
+      <%= form.date_field :promised_on,
+            class: class_names("form-control", "is-invalid": repair.errors[:promised_on].any?) %>
+      <% repair.errors.full_messages_for(:promised_on).each do |message| %>
+        <div class="invalid-feedback"><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if policy(repair).may_edit?(:collected_at) %>
+    <div class="mb-3">
+      <%= form.label :collected_at, "Collected at", class: "form-label" %>
+      <%= form.datetime_field :collected_at,
+            class: class_names("form-control", "is-invalid": repair.errors[:collected_at].any?) %>
+      <% repair.errors.full_messages_for(:collected_at).each do |message| %>
+        <div class="invalid-feedback"><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
     <%= form.label :diagnosis, class: "form-label" %>
     <%= form.rich_text_area :diagnosis %>
   </div>
-  <hr>
-  <h2 class="h5">Services charged</h2>
-  <div id="repair-line-items">
-    <%= form.fields_for :repair_line_items do |line_form| %>
-      <%= render "line_item_fields", form: line_form %>
-    <% end %>
-  </div>
 
-  <hr>
-  <h2 class="h5">Add photos</h2>
+  <% if policy(repair).may_edit?(:repair_line_items_attributes) %>
+    <hr>
+    <h2 class="h5">Services charged</h2>
+    <div id="repair-line-items">
+      <%= form.fields_for :repair_line_items do |line_form| %>
+        <%= render "line_item_fields", form: line_form %>
+      <% end %>
+    </div>
+  <% end %>
 
-  <div class="mb-3">
-    <%= form.label :photos, "Add photos", class: "form-label" %>
-    <%= form.file_field :photos, multiple: true, accept: "image/jpeg,image/png",
-          class: class_names("form-control", "is-invalid": repair.errors[:photos].any?) %>
-    <% repair.errors.full_messages_for(:photos).each do |message| %>
-      <div class="invalid-feedback d-block"><%= message %></div>
-    <% end %>
-  </div>
+  <% if policy(repair).may_edit?(:photos) %>
+    <hr>
+    <h2 class="h5">Add photos</h2>
+
+    <div class="mb-3">
+      <%= form.label :photos, "Add photos", class: "form-label" %>
+      <%= form.file_field :photos, multiple: true, accept: "image/jpeg,image/png",
+            class: class_names("form-control", "is-invalid": repair.errors[:photos].any?) %>
+      <% repair.errors.full_messages_for(:photos).each do |message| %>
+        <div class="invalid-feedback d-block"><%= message %></div>
+      <% end %>
+    </div>
+  <% end %>
 
   <%= form.submit class: "btn btn-primary mt-3" %>
   <%= link_to "Cancel", repair.persisted? ? repair : repairs_path, class: "btn btn-outline-secondary mt-3" %>
@@ -101,11 +118,13 @@
       <div class="col-auto text-center mb-2">
         <%= image_tag photo.variant(:thumb), class: "img-thumbnail",
               alt: "Photo of #{repair.bike.model} (#{repair.bike.serial_number}), repair ##{repair.id}" %>
-        <div class="mt-1">
-          <%= button_to "Remove", repair_photo_path(repair, photo), method: :delete,
-                class: "btn btn-sm btn-outline-danger",
-                form: { data: { turbo_confirm: "Remove this photo?" } } %>
-        </div>
+        <% if policy(repair).may_edit?(:photos) %>
+          <div class="mt-1">
+            <%= button_to "Remove", repair_photo_path(repair, photo), method: :delete,
+                  class: "btn btn-sm btn-outline-danger",
+                  form: { data: { turbo_confirm: "Remove this photo?" } } %>
+          </div>
+        <% end %>
       </div>
     <% end %>
   </div>

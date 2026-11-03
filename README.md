@@ -11,6 +11,7 @@ grow into the full Wheelhouse system over the course of the semester.
 - [User Stories](docs/user-stories.md)
 - [Domain Model](docs/domain-model.md)
 - [Decisions](docs/decisions.md)
+- [Permissions](docs/permissions.md)
 - [Wireframes](docs/wireframes.md)
 - [API Reference](docs/api.md)
 
@@ -53,15 +54,17 @@ for seed accounts, or use the sign-up page.
 ## Signing in (development)
 
 Most pages now require a session — the exceptions are the services price list, signing in,
-signing up, and the forgotten-password flow. The seed creates four accounts to sign in with.
-**These accounts and passwords exist only in development — never use them anywhere else.**
+signing up, and the forgotten-password flow. Authorization is enforced with Pundit; the full
+rules are in [docs/permissions.md](docs/permissions.md). The seed creates five accounts to sign
+in with. **These accounts and passwords exist only in development — never use them anywhere else.**
 
-| Email                   | Password          | Role                | Linked staff member |
-|--------------------------|--------------------|----------------------|-----------------------|
-| owner@wheelhouse.cl      | Ownerpass123       | owner                | Sofia Morales          |
-| counter@wheelhouse.cl    | Counterpass456     | counter              | Daniel Rojas            |
-| mechanic@wheelhouse.cl   | Mechanicpass789    | mechanic             | Camila Fuentes          |
-| newhire@wheelhouse.cl    | Newhirepass000     | counter (default)    | — (no staff member)    |
+| Email | Password | Role | Linked staff member | What they can do |
+|---|---|---|---|---|
+| owner@wheelhouse.cl | Ownerpass123 | owner | Sofia Morales | Everything — every resource, every action. |
+| counter@wheelhouse.cl | Counterpass456 | counter | Daniel Rojas | Runs the front desk: creates and edits customers, bikes, and any repair that hasn't been handed back; reads services and staff; can't delete anything. |
+| mechanic@wheelhouse.cl | Mechanicpass789 | mechanic | Camila Fuentes | Sees and edits only Camila Fuentes's own, not-yet-handed-back repairs — status, diagnosis and photos only; no access to customers or bikes. |
+| mechanic2@wheelhouse.cl | Mechanictwo123 | mechanic | Mateo Rivera | Sees and edits only Mateo Rivera's own, not-yet-handed-back repairs — status, diagnosis and photos only; no access to customers or bikes. |
+| newhire@wheelhouse.cl | Newhirepass000 | counter (default) | — (no staff member) | Same as `counter@wheelhouse.cl` above — this is what the sign-up page gives everyone. |
 
 New accounts can also be created from the sign-up page (linked from the sign-in page) — a
 sign-up always gets the default role and no linked staff member. Promoting an account or

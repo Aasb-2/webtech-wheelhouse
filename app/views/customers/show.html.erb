@@ -2,10 +2,14 @@
 
 <h1><%= @customer.name %></h1>
 <p><%= @customer.phone %></p>
-<%= link_to "Edit", edit_customer_path(@customer), class: "btn btn-outline-primary" %>
-<%= button_to "Delete", customer_path(@customer), method: :delete,
-      class: "btn btn-danger",
-      form: { class: "d-inline", data: { turbo_confirm: "Delete customer #{@customer.name}?" } } %>
+<% if policy(@customer).edit? %>
+  <%= link_to "Edit", edit_customer_path(@customer), class: "btn btn-outline-primary" %>
+<% end %>
+<% if policy(@customer).destroy? %>
+  <%= button_to "Delete", customer_path(@customer), method: :delete,
+        class: "btn btn-danger",
+        form: { class: "d-inline", data: { turbo_confirm: "Delete customer #{@customer.name}?" } } %>
+<% end %>
 
 <h2>Bikes</h2>
 <% if @customer.bikes.any? %>
@@ -24,6 +28,8 @@
 <% else %>
   <p>No bikes on file for this customer.</p>
 <% end %>
-<%= link_to "New bike for #{@customer.name}", new_bike_path(customer_id: @customer.id), class: "btn btn-outline-primary mb-3" %>
+<% if policy(Bike).new? %>
+  <%= link_to "New bike for #{@customer.name}", new_bike_path(customer_id: @customer.id), class: "btn btn-outline-primary mb-3" %>
+<% end %>
 
 <%= link_to "Back to Customers", customers_path %>

@@ -2,7 +2,9 @@
 
 <p>Here's everything we do, and what it costs. A typical repair usually needs two or three of these.</p>
 
-<%= link_to "New service", new_service_item_path, class: "btn btn-primary mb-3" %>
+<% if policy(ServiceItem).new? %>
+  <%= link_to "New service", new_service_item_path, class: "btn btn-primary mb-3" %>
+<% end %>
 
 <% if @service_items.any? %>
   <table class="table table-striped">

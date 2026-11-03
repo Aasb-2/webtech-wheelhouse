@@ -4,15 +4,21 @@
 <p>Serial number: <%= @bike.serial_number %></p>
 <p>Owner: <%= link_to @bike.customer.name, customer_path(@bike.customer) %></p>
 
-<%= link_to "Edit", edit_bike_path(@bike), class: "btn btn-outline-primary" %>
-<%= button_to "Delete", bike_path(@bike), method: :delete,
-      class: "btn btn-danger",
-      form: { class: "d-inline", data: { turbo_confirm: "Delete bike #{@bike.serial_number}?" } } %>
+<% if policy(@bike).edit? %>
+  <%= link_to "Edit", edit_bike_path(@bike), class: "btn btn-outline-primary" %>
+<% end %>
+<% if policy(@bike).destroy? %>
+  <%= button_to "Delete", bike_path(@bike), method: :delete,
+        class: "btn btn-danger",
+        form: { class: "d-inline", data: { turbo_confirm: "Delete bike #{@bike.serial_number}?" } } %>
+<% end %>
 
-<%= link_to "New repair for this bike", new_repair_path(bike_id: @bike.id), class: "btn btn-outline-primary mb-3" %>
+<% if policy(Repair).new? %>
+  <%= link_to "New repair for this bike", new_repair_path(bike_id: @bike.id), class: "btn btn-outline-primary mb-3" %>
+<% end %>
 
 <h2>Repairs</h2>
-<% if @bike.repairs.any? %>
+<% if @repairs.any? %>
   <table class="table table-striped">
     <thead>
       <tr>
@@ -26,7 +32,7 @@
       </tr>
     </thead>
     <tbody>
-      <%= render @bike.repairs %>
+      <%= render @repairs %>
     </tbody>
   </table>
 <% else %>

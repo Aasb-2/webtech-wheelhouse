@@ -18,7 +18,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-auto">
         <% if authenticated? %>
           <li class="nav-item">
             <%= link_to "Home", root_path, class: "nav-link #{'active' if current_page?(root_path)}" %>
@@ -28,18 +28,26 @@
           <%= link_to "Services", service_items_path, class: "nav-link #{'active' if current_page?(service_items_path)}" %>
         </li>
         <% if authenticated? %>
-          <li class="nav-item">
-            <%= link_to "Customers", customers_path, class: "nav-link #{'active' if current_page?(customers_path)}" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Bikes", bikes_path, class: "nav-link #{'active' if current_page?(bikes_path)}" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Repairs", repairs_path, class: "nav-link #{'active' if current_page?(repairs_path)}" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Mechanics", mechanics_path, class: "nav-link #{'active' if current_page?(mechanics_path)}" %>
-          </li>
+          <% if policy(Customer).index? %>
+            <li class="nav-item">
+              <%= link_to "Customers", customers_path, class: "nav-link #{'active' if current_page?(customers_path)}" %>
+            </li>
+          <% end %>
+          <% if policy(Bike).index? %>
+            <li class="nav-item">
+              <%= link_to "Bikes", bikes_path, class: "nav-link #{'active' if current_page?(bikes_path)}" %>
+            </li>
+          <% end %>
+          <% if policy(Repair).index? %>
+            <li class="nav-item">
+              <%= link_to "Repairs", repairs_path, class: "nav-link #{'active' if current_page?(repairs_path)}" %>
+            </li>
+          <% end %>
+          <% if policy(Mechanic).index? %>
+            <li class="nav-item">
+              <%= link_to "Mechanics", mechanics_path, class: "nav-link #{'active' if current_page?(mechanics_path)}" %>
+            </li>
+          <% end %>
           <li class="nav-item">
             <%= link_to "Visiting the Workshop", visiting_path, class: "nav-link #{'active' if current_page?(visiting_path)}" %>
           </li>

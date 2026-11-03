@@ -27,3 +27,11 @@ Giving `counter` to every freshly-created account — through the sign-up form, 
 written by hand that sends `user[role]=owner` — means a new account starts with the least it can
 do to the data. Promoting it to `mechanic` or `owner` is a deliberate act performed from the seed
 or the console, by someone who already has that authority.
+
+## Controllers exempt from Pundit
+
+`PagesController`, `SessionsController`, `RegistrationsController` and `PasswordsController` skip
+`verify_authorized`/`verify_policy_scoped`. None of their actions touch a policized model — they
+control authentication itself (signing in, signing up, resetting a password) or render static,
+informational pages gated only by `require_authentication`. There is no record or scope for a
+policy to govern.

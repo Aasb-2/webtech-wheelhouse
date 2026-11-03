@@ -1,4 +1,7 @@
 class RegistrationsController < ApplicationController
+  skip_after_action :verify_authorized
+  skip_after_action :verify_policy_scoped
+  
   allow_unauthenticated_access only: %i[new create]
 
   def new

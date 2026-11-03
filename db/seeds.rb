@@ -35,7 +35,8 @@ end
 mechanics = [
   Mechanic.find_or_create_by!(name: "Sofia Morales"),
   Mechanic.find_or_create_by!(name: "Daniel Rojas"),
-  Mechanic.find_or_create_by!(name: "Camila Fuentes")
+  Mechanic.find_or_create_by!(name: "Camila Fuentes"),
+  Mechanic.find_or_create_by!(name: "Mateo Rivera")
 ]
 
 # Accounts
@@ -62,6 +63,10 @@ counter_account = seed_account(
 mechanic_account = seed_account(
   email_address: "mechanic@wheelhouse.cl", password: "Mechanicpass789", role: :mechanic, mechanic: mechanics[2]
 )
+mechanic_account_two = seed_account(
+  email_address: "mechanic2@wheelhouse.cl", password: "Mechanictwo123", role: :mechanic, mechanic: mechanics[3]
+)
+# No role or mechanic passed — this one is created with the column default (`counter`)
 # No role or mechanic passed — this one is created with the column default (`counter`)
 # and belongs to no staff member, demonstrating both defaults literally rather than restating them.
 unassigned_account = seed_account(
@@ -172,10 +177,20 @@ repair_data = [
   { key: :extra_two, bike: "DOM-1001", mechanic: mechanics[1], taken_in_by: counter_account,
     status: "ready_for_pickup", decision: "approved", promised_on: today + 1,
     dropped_off_at: today.beginning_of_day - 1.day + 10.hours },
-  { key: :extra_three, bike: "CON-1003", mechanic: mechanics[2], taken_in_by: mechanic_account,
+    { key: :extra_three, bike: "CON-1003", mechanic: mechanics[2], taken_in_by: mechanic_account,
     status: "collected", decision: "declined", promised_on: today - 6.days,
     dropped_off_at: today.beginning_of_day - 8.days + 11.hours,
-    collected_at: today.beginning_of_day - 6.days + 14.hours }
+    collected_at: today.beginning_of_day - 6.days + 14.hours },
+  { key: :mateo_one, bike: "ENF-1234", mechanic: mechanics[3], taken_in_by: counter_account,
+    status: "in_progress", decision: "approved", promised_on: today + 2,
+    dropped_off_at: today.beginning_of_day - 1.day + 9.hours },
+  { key: :mateo_two, bike: "ENF-1234", mechanic: mechanics[3], taken_in_by: owner_account,
+    status: "collected", decision: "approved", promised_on: today - 3.days,
+    dropped_off_at: today.beginning_of_day - 6.days + 10.hours,
+    collected_at: today.beginning_of_day - 4.days + 15.hours },
+  { key: :no_mechanic_yet, bike: "ENF-1234", mechanic: nil, taken_in_by: counter_account,
+    status: "dropped_off", decision: nil, promised_on: today + 6,
+    dropped_off_at: today.beginning_of_day + 13.hours }
 ]
 
 repair_data.each do |data|
@@ -248,6 +263,12 @@ line_items = {
   ],
   extra_three: [
     ["Brake inspection", 8.00]
+  ],
+  mateo_one: [
+    ["Tune-up", 45.00]
+  ],
+  mateo_two: [
+    ["Chain replacement", 30.00]
   ]
 }
 
@@ -310,8 +331,11 @@ diagnosis_text = {
   declined: "<p>Customer <strong>declined</strong> the suspension service after reviewing cost.</p><ul><li>Fork inspected</li><li>Minor oil seep noted, not urgent</li></ul>",
   history_one: "<p>Routine <strong>brake bleed</strong> performed, no complications.</p>",
   history_two: "<p>Gear and cable service completed.</p><ul><li>Rear derailleur indexed</li><li>Cables lubricated</li></ul>",
-  historical: "<p><strong>Full service</strong> completed ahead of long-term storage.</p><ul><li>Drivetrain degreased</li><li>Brakes inspected and adjusted</li></ul>"
-  # fresh, extra_one, extra_two, extra_three: intentionally blank — freshly dropped-off repairs have no diagnosis yet
+  historical: "<p><strong>Full service</strong> completed ahead of long-term storage.</p><ul><li>Drivetrain degreased</li><li>Brakes inspected and adjusted</li></ul>",
+  mateo_one: "<p><strong>Full tune-up underway.</strong></p><ul><li>Cables and housing inspected</li></ul>",
+  mateo_two: "<p>Chain replaced and tested. <strong>Collected, no issues reported.</strong></p>"
+  # fresh, extra_one, extra_two, extra_three, no_mechanic_yet: intentionally blank — freshly dropped-off
+  # repairs, or ones with no mechanic assigned yet, have no diagnosis yet
 }
 
 diagnosis_text.each do |repair_key, html|
